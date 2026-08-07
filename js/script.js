@@ -193,12 +193,28 @@ async function fetchGASGet(action) {
 function getAge(dateString) {
     const today = new Date();
     const birthDate = new Date(dateString);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+    
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    
+    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+        years--;
+        months += 12;
     }
-    return age;
+    
+    if (today.getDate() < birthDate.getDate()) {
+        months--;
+        if (months < 0) {
+            months += 12;
+        }
+    }
+    
+    let result = [];
+    if (years > 0) result.push(`${years} Tahun`);
+    if (months > 0) result.push(`${months} Bulan`);
+    if (years === 0 && months === 0) result.push("0 Bulan");
+    
+    return result.join(" ");
 }
 
 function formatDateToWIB(dateObj) {
