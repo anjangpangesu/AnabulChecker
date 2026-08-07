@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anabul Checker - Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23ff9f43' d='M88,72a24,24,0,1,1,24-24A24,24,0,0,1,88,72Zm80-48a24,24,0,1,0,24,24A24,24,0,0,0,168,24ZM68,100A24,24,0,1,0,92,124,24,24,0,0,0,68,100Zm120,0a24,24,0,1,0,24,24A24,24,0,0,0,188,100Zm-21.75,56.55A38.2,38.2,0,0,0,128,144a38.2,38.2,0,0,0-38.25,12.55,42.54,42.54,0,0,0-10,33.24A40,40,0,0,0,119,223.77c2.81.42,5.77.67,9,.67s6.14-.25,9-.67a40,40,0,0,0,39.26-34C177.34,180.79,173.83,165.73,166.25,156.55Z'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="top-navbar">
+    <a href="/index.html" class="logo-area">
+      <i class="ph-fill ph-paw-print logo-icon" style="color: var(--primary-color); font-size: 2rem;"></i>
+      Anabul Checker
+    </a>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="ph ph-list"></i>
+    </div>
+    <div class="nav-menu">
+      <a href="/index.html" class="nav-item active">
+        <i class="ph ph-squares-four nav-icon"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/menu/anabul/index.html" class="nav-item">
+        <i class="ph ph-paw-print nav-icon"></i>
+        <span>Profil Hewan</span>
+      </a>
+      <a href="/menu/jadwal/index.html" class="nav-item">
+        <i class="ph ph-calendar-blank nav-icon"></i>
+        <span>Jadwal Makan</span>
+      </a>
+      <a href="/menu/stok/index.html" class="nav-item">
+        <i class="ph ph-package nav-icon"></i>
+        <span>Stok</span>
+      </a>
+      <a href="/menu/anabul-liar/index.html" class="nav-item">
+        <i class="ph ph-cat nav-icon"></i>
+        <span>Street Feeding</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-section">
+      <div class="header-text">
+        <h1>Hello, Pet Parent! <i class="ph-fill ph-hand-waving header-title-icon" style="color: #ffca28;"></i></h1>
+        <p>Here is the summary of your pets today.</p>
+      </div>
+      <div class="header-actions">
+        <a href="/menu/stok/index.html" class="btn btn-primary">+ Tambah Stok</a>
+        <a href="/menu/jadwal/index.html" class="btn btn-secondary">Jadwal Baru</a>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="dashboard-cards">
+      <div class="summary-card card-orange">
+        <div class="summary-icon"><i class="ph ph-paw-print" style="font-size: 40px;"></i></div>
+        <div class="summary-title">Total Pets</div>
+        <div class="summary-value" id="stats-pets">-</div>
+      </div>
+      <div class="summary-card card-red">
+        <div class="summary-icon"><i class="ph ph-warning-circle" style="font-size: 40px;"></i></div>
+        <div class="summary-title">Low Stock</div>
+        <div class="summary-value" id="stats-low">-</div>
+      </div>
+      <div class="summary-card card-green">
+        <div class="summary-icon"><i class="ph ph-clock" style="font-size: 40px;"></i></div>
+        <div class="summary-title">Jadwal Yang Akan Datang</div>
+        <div class="summary-value" id="stats-meals">-</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Tables -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+      
+      <!-- Low Stock Table -->
+      <div class="content-box" style="margin-top: 0;">
+         <div class="content-box-header">
+           <i class="ph-fill ph-warning-circle header-title-icon" style="color: var(--danger-color);"></i> Stok Menipis/Habis
+         </div>
+         <div class="table-container">
+           <table>
+             <thead>
+               <tr>
+                 <th>Nama Stok</th>
+                 <th>Sisa</th>
+                 <th>Satuan</th>
+               </tr>
+             </thead>
+             <tbody id="lowStockTableBody">
+               <tr><td colspan="3" style="text-align:center; color:var(--text-light);">Memuat data...</td></tr>
+             </tbody>
+           </table>
+         </div>
+      </div>
+
+      <!-- Upcoming Meals Table -->
+      <div class="content-box" style="margin-top: 0;">
+         <div class="content-box-header">
+           <i class="ph-fill ph-calendar-blank header-title-icon" style="color: var(--primary-color);"></i> Jadwal Mendatang
+         </div>
+         <div class="table-container">
+           <table>
+             <thead>
+               <tr>
+                 <th>Waktu</th>
+                 <th>Anabul</th>
+                 <th>Jadwal</th>
+               </tr>
+             </thead>
+             <tbody id="upcomingMealsTableBody">
+               <tr><td colspan="3" style="text-align:center; color:var(--text-light);">Memuat data...</td></tr>
+             </tbody>
+           </table>
+         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script>
+    async function loadDashboardStats() {
+      const res = await fetchGASGet('getDashboardStats');
+      if (res && res.data) {
+        document.getElementById('stats-pets').innerText = res.data.totalPets;
+        document.getElementById('stats-low').innerText = res.data.lowStock;
+        document.getElementById('stats-meals').innerText = res.data.upcomingMeals;
+
+        const lowStockTbody = document.getElementById('lowStockTableBody');
+        const mealsTbody = document.getElementById('upcomingMealsTableBody');
+
+        if (res.data.lowStockItems && res.data.lowStockItems.length > 0) {
+           lowStockTbody.innerHTML = '';
+           res.data.lowStockItems.forEach(item => {
+              lowStockTbody.innerHTML += `<tr><td>${item['Nama Stok']}</td><td><b style="color:var(--danger-color);">${item['Jumlah Stok']}</b></td><td>${item['Satuan Stok']}</td></tr>`;
+           });
+        } else {
+           lowStockTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-light);">Semua stok aman!</td></tr>`;
+        }
+
+        if (res.data.upcomingMealsList && res.data.upcomingMealsList.length > 0) {
+           mealsTbody.innerHTML = '';
+           res.data.upcomingMealsList.forEach(item => {
+              mealsTbody.innerHTML += `<tr><td>${item['Waktu']}</td><td><b>${item['Nama Anabul']}</b></td><td>${item['Jadwal']}</td></tr>`;
+           });
+        } else {
+           mealsTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-light);">Tidak ada jadwal mendatang.</td></tr>`;
+        }
+      }
+    }
+    
+    // Attempt to load stats on start
+    document.addEventListener('DOMContentLoaded', loadDashboardStats);
+  </script>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anabul Checker - Jadwal Makan</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23ff9f43' d='M88,72a24,24,0,1,1,24-24A24,24,0,0,1,88,72Zm80-48a24,24,0,1,0,24,24A24,24,0,0,0,168,24ZM68,100A24,24,0,1,0,92,124,24,24,0,0,0,68,100Zm120,0a24,24,0,1,0,24,24A24,24,0,0,0,188,100Zm-21.75,56.55A38.2,38.2,0,0,0,128,144a38.2,38.2,0,0,0-38.25,12.55,42.54,42.54,0,0,0-10,33.24A40,40,0,0,0,119,223.77c2.81.42,5.77.67,9,.67s6.14-.25,9-.67a40,40,0,0,0,39.26-34C177.34,180.79,173.83,165.73,166.25,156.55Z'/></svg>">
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="top-navbar">
+    <a href="../../index.html" class="logo-area">
+      <i class="ph-fill ph-paw-print logo-icon" style="color: var(--primary-color); font-size: 2rem;"></i>
+      Anabul Checker
+    </a>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="ph ph-list"></i>
+    </div>
+    <div class="nav-menu">
+      <a href="../../index.html" class="nav-item">
+        <i class="ph ph-squares-four nav-icon"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/menu/anabul/index.html" class="nav-item">
+        <i class="ph ph-paw-print nav-icon"></i>
+        <span>Profil Hewan</span>
+      </a>
+      <a href="/menu/jadwal/index.html" class="nav-item active">
+        <i class="ph ph-calendar-blank nav-icon"></i>
+        <span>Jadwal Makan</span>
+      </a>
+      <a href="/menu/stok/index.html" class="nav-item">
+        <i class="ph ph-package nav-icon"></i>
+        <span>Stok</span>
+      </a>
+      <a href="/menu/anabul-liar/index.html" class="nav-item">
+        <i class="ph ph-cat nav-icon"></i>
+        <span>Street Feeding</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-section" style="margin-bottom: 20px;">
+      <div class="header-text">
+        <h1 style="font-size:1.8rem;"><i class="ph-fill ph-calendar-blank header-title-icon" style="color: var(--primary-color);"></i> Jadwal Anabul</h1>
+        <p>Atur jadwal makan, minum obat, snack, dll untuk anabulmu</p>
+      </div>
+      <div class="header-actions">
+         <button class="btn btn-primary" id="btnShowForm">+ Tambah Jadwal</button>
+      </div>
+    </div>
+    
+    <div class="content-box">
+      <div class="actions-bar">
+         <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Cari jadwal...">
+         </div>
+         <select id="filterSelect" class="filter-btn">
+            <option value="all">Semua Status</option>
+            <option value="Belum">Belum</option>
+            <option value="Selesai">Selesai</option>
+            <option value="Batal">Batal</option>
+         </select>
+      </div>
+
+    <!-- Form Tambah Jadwal (Hidden by default) -->
+    <div id="formTambahContainer" class="form-modal-overlay hidden">
+      <div class="form-container">
+      <h3 class="mb-3">Tambah Jadwal</h3>
+      <form id="formTambahJadwal">
+        <div class="form-group">
+          <label>Pilih Anabul</label>
+          <select id="idAnabul" class="form-control" required>
+            <option value="" disabled selected>Pilih Anabul</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Jadwal Untuk</label>
+          <select id="jadwal" class="form-control" required>
+            <option value="" disabled selected>Pilih Jadwal</option>
+            <option value="Makan">Makan</option>
+            <option value="Minum Obat">Minum Obat</option>
+            <option value="Snack">Snack</option>
+            <option value="Mandi">Mandi</option>
+            <option value="Ganti Pasir">Ganti Pasir</option>
+            <option value="Bersihin Kandang">Bersihin Kandang</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Durasi / Frekuensi</label>
+          <select id="durasi" class="form-control" required>
+            <option value="1">1 Kali</option>
+            <option value="2">2 Kali</option>
+            <option value="3">3 Kali</option>
+            <option value="4">4 Kali</option>
+          </select>
+        </div>
+        
+        <!-- Dinamis Kontainer untuk Waktu & Stok -->
+        <div id="dynamicFieldsContainer"></div>
+        
+        <div class="btn-group">
+          <input type="hidden" id="idEdit" value="">
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">Simpan Jadwal</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelForm">Batal</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+    <!-- Tabel Jadwal -->
+    <div class="table-container">
+      <table id="jadwalTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Anabul</th>
+            <th>Jadwal</th>
+            <th>Waktu</th>
+            <th>Stok Yang Diberikan</th>
+            <th>Jumlah</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="jadwalTableBody">
+          <!-- Data jadwal dirender di sini -->
+        </tbody>
+      </table>
+    </div>
+
+    </div> <!-- End of content-box -->
+  </div>
+
+  <script src="../../js/script.js"></script>
+  <script>
+    const formContainer = document.getElementById('formTambahContainer');
+    const form = document.getElementById('formTambahJadwal');
+    const btnShowForm = document.getElementById('btnShowForm');
+    const btnCancelForm = document.getElementById('btnCancelForm');
+    const tableBody = document.getElementById('jadwalTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterSelect');
+    
+    const selectAnabul = document.getElementById('idAnabul');
+    const selectDurasi = document.getElementById('durasi');
+    const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+    
+    let allJadwal = [];
+    let stokData = [];
+    let anabulData = [];
+
+    btnShowForm.addEventListener('click', () => {
+      formContainer.classList.remove('hidden');
+      btnShowForm.classList.add('hidden');
+      renderDynamicFields();
+    });
+
+    btnCancelForm.addEventListener('click', () => {
+      formContainer.classList.add('hidden');
+      btnShowForm.classList.remove('hidden');
+      document.getElementById('idEdit').value = '';
+      document.getElementById('btnSubmitForm').innerText = 'Simpan Jadwal';
+      form.reset();
+      renderDynamicFields();
+    });
+
+    selectDurasi.addEventListener('change', renderDynamicFields);
+
+    function renderDynamicFields() {
+      const durasi = parseInt(selectDurasi.value) || 1;
+      dynamicContainer.innerHTML = '';
+      
+      let stokOptions = '<option value="" selected>Tidak Pakai Stok</option>';
+      stokData.forEach(item => {
+        if(item.Status === 'Tersedia') {
+          stokOptions += `<option value="${item.ID}">${item['Nama Stok']} (Sisa: ${item['Jumlah Stok']} ${item['Satuan Stok']})</option>`;
+        }
+      });
+
+      for(let i = 1; i <= durasi; i++) {
+        const div = document.createElement('div');
+        div.className = 'dynamic-group';
+        div.innerHTML = `
+          <div class="dynamic-group-title">Jadwal Ke-${i}</div>
+          <div class="form-group">
+            <label>Tanggal dan Waktu</label>
+            <input type="datetime-local" class="form-control d-waktu" required>
+          </div>
+          <div class="form-group">
+            <label>Pilih Stok (Opsional)</label>
+            <select class="form-control d-stok">${stokOptions}</select>
+          </div>
+          <div class="form-group">
+            <label>Jumlah Yang Diberikan</label>
+            <input type="number" step="0.01" class="form-control d-jumlah" placeholder="Contoh: 100">
+          </div>
+        `;
+        dynamicContainer.appendChild(div);
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const idAnabul = document.getElementById('idAnabul').value;
+      const namaAnabul = selectAnabul.options[selectAnabul.selectedIndex].text;
+      const jadwal = document.getElementById('jadwal').value;
+      
+      const jadwalList = [];
+      const groups = document.querySelectorAll('.dynamic-group');
+      
+      groups.forEach(group => {
+        const dWaktu = group.querySelector('.d-waktu').value;
+        const dStok = group.querySelector('.d-stok').value;
+        const dStokName = dStok ? group.querySelector('.d-stok').options[group.querySelector('.d-stok').selectedIndex].text.split(' (')[0] : '';
+        const dJumlah = group.querySelector('.d-jumlah').value;
+        
+        const dateObj = new Date(dWaktu);
+        
+        jadwalList.push({
+          idAnabul: idAnabul,
+          namaAnabul: namaAnabul,
+          jadwal: jadwal,
+          waktu: formatDateToWIB(dateObj),
+          isoTimestamp: dateObj.toISOString(),
+          idStok: dStok,
+          stokDiberikan: dStokName,
+          jumlahDiberikan: parseFloat(dJumlah) || 0
+        });
+      });
+
+      const idEdit = document.getElementById('idEdit').value;
+      const action = idEdit ? 'updateJadwal' : 'addJadwal';
+      
+      let payload = { jadwalList };
+      if (idEdit) {
+        payload = { ...jadwalList[0], id: idEdit };
+      }
+
+      const res = await fetchGAS(action, payload);
+      if(res) {
+        formContainer.classList.add('hidden');
+        btnShowForm.classList.remove('hidden');
+        document.getElementById('idEdit').value = '';
+        document.getElementById('btnSubmitForm').innerText = 'Simpan Jadwal';
+        form.reset();
+        showModal('success', 'Berhasil!', res.message, () => {
+          loadJadwal();
+          fetchReferences(); // Reload stock
+        });
+      }
+    });
+
+    async function loadJadwal() {
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Memuat data...</td></tr>';
+      const res = await fetchGASGet('getJadwal');
+      
+      if(res && res.data) {
+        allJadwal = res.data;
+        renderTable(allJadwal);
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Gagal memuat data.</td></tr>';
+      }
+    }
+
+    function renderTable(dataToRender) {
+      tableBody.innerHTML = '';
+      if(dataToRender.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data jadwal kosong.</td></tr>';
+        return;
+      }
+
+      dataToRender.forEach((item, index) => {
+        let statusBadge = item.Status === 'Selesai' ? 'badge-success' : (item.Status === 'Batal' ? 'badge-danger' : 'badge-warning');
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td><b>${item['Nama Anabul']}</b></td>
+          <td>${item['Jadwal']}</td>
+          <td>${item['Waktu']}</td>
+          <td>${item['Stok Yang Diberikan'] || '-'}</td>
+          <td>${item['Jumlah Yang Diberikan'] > 0 ? item['Jumlah Yang Diberikan'] : '-'}</td>
+          <td><span class="badge ${statusBadge}">${item.Status}</span></td>
+          <td style="white-space: nowrap; display: flex; gap: 5px;">
+             ${item.Status !== 'Selesai' && item.Status !== 'Batal' ? `<button class="btn btn-sm btn-success" onclick="selesaiJadwal('${item.ID}')" title="Selesai"><i class="ph ph-check-circle"></i></button>` : ''}
+             ${item.Status !== 'Selesai' && item.Status !== 'Batal' ? `<button class="btn btn-sm btn-warning" onclick="batalJadwal('${item.ID}')" title="Batal"><i class="ph ph-x-circle"></i></button>` : ''}
+             <button class="btn btn-sm btn-info" onclick="editJadwal('${item.ID}')" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+             <button class="btn btn-sm btn-danger" onclick="hapusJadwal('${item.ID}')" title="Hapus"><i class="ph ph-trash"></i></button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function selesaiJadwal(id) {
+      showConfirmModal('Selesaikan Jadwal', 'Tandai jadwal ini sebagai Selesai?', async () => {
+        const res = await fetchGAS('updateJadwalStatus', {id: id, status: 'Selesai'});
+        if(res) {
+          showModal('success', 'Berhasil', 'Status jadwal berhasil diupdate', () => {
+             loadJadwal();
+          });
+        }
+      });
+    }
+
+    function batalJadwal(id) {
+      showConfirmModal('Batalkan Jadwal', 'Batalkan jadwal ini? Stok akan dikembalikan.', async () => {
+        const res = await fetchGAS('updateJadwalStatus', {id: id, status: 'Batal'});
+        if(res) {
+          showModal('success', 'Berhasil', 'Status jadwal dibatalkan', () => {
+             loadJadwal();
+          });
+        }
+      });
+    }
+
+    function editJadwal(id) {
+      const item = allJadwal.find(s => s.ID === id);
+      if(item) {
+        document.getElementById('idEdit').value = item.ID;
+        
+        let anabulOption = Array.from(selectAnabul.options).find(opt => opt.text === item['Nama Anabul']);
+        if(anabulOption) selectAnabul.value = anabulOption.value;
+        
+        document.getElementById('jadwal').value = item['Jadwal'];
+        
+        // Disable duration since editing implies editing a single record
+        selectDurasi.value = 1;
+        selectDurasi.disabled = true;
+        renderDynamicFields();
+        
+        // After rendering, set the dynamic values
+        setTimeout(() => {
+          let stokOption = Array.from(document.querySelector('.d-stok').options).find(opt => opt.text.includes(item['Stok Yang Diberikan']));
+          if(stokOption) document.querySelector('.d-stok').value = stokOption.value;
+          
+          document.querySelector('.d-jumlah').value = item['Jumlah Yang Diberikan'];
+        }, 100);
+        
+        document.getElementById('btnSubmitForm').innerText = 'Update Jadwal';
+        formContainer.classList.remove('hidden');
+        btnShowForm.classList.add('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function hapusJadwal(id) {
+      showConfirmModal('Hapus Jadwal', 'Yakin ingin menghapus jadwal ini?', async () => {
+        const res = await fetchGAS('deleteJadwal', {id: id});
+        if(res) {
+          showModal('success', 'Berhasil', 'Jadwal berhasil dihapus', () => {
+             loadJadwal();
+          });
+        }
+      });
+    }
+
+    // Filter & Search Logic
+    function applyFilter() {
+      let filtered = [...allJadwal];
+      
+      const q = searchInput.value.toLowerCase();
+      if(q) {
+        filtered = filtered.filter(item => 
+          item['Nama Anabul'].toLowerCase().includes(q) || 
+          item['Jadwal'].toLowerCase().includes(q)
+        );
+      }
+      
+      const filterVal = filterSelect.value;
+      if(filterVal === 'Selesai' || filterVal === 'Belum' || filterVal === 'Batal') {
+        filtered = filtered.filter(item => item.Status === filterVal);
+      }
+      
+      if(filterVal === 'newest') {
+         // Sort by isoTimestamp roughly if exists, or just leave as is (spreadsheet append order)
+         filtered.reverse();
+      }
+
+      renderTable(filtered);
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterSelect.addEventListener('change', applyFilter);
+
+    async function fetchReferences() {
+      const resStok = await fetchGASGet('getStok');
+      if(resStok && resStok.data) stokData = resStok.data;
+      
+      const resAnabul = await fetchGASGet('getAnabul');
+      if(resAnabul && resAnabul.data) {
+        anabulData = resAnabul.data;
+        selectAnabul.innerHTML = '<option value="" disabled selected>Pilih Anabul</option>';
+        anabulData.forEach(item => {
+          selectAnabul.innerHTML += `<option value="${item.ID}">${item.Nama} (${item.Kategori})</option>`;
+        });
+      }
+      renderDynamicFields();
+    }
+
+    // Load initial
+    fetchReferences();
+    loadJadwal();
+  </script>
+</body>
+</html>

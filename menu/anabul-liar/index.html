@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anabul Checker - Street Feeding</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23ff9f43' d='M88,72a24,24,0,1,1,24-24A24,24,0,0,1,88,72Zm80-48a24,24,0,1,0,24,24A24,24,0,0,0,168,24ZM68,100A24,24,0,1,0,92,124,24,24,0,0,0,68,100Zm120,0a24,24,0,1,0,24,24A24,24,0,0,0,188,100Zm-21.75,56.55A38.2,38.2,0,0,0,128,144a38.2,38.2,0,0,0-38.25,12.55,42.54,42.54,0,0,0-10,33.24A40,40,0,0,0,119,223.77c2.81.42,5.77.67,9,.67s6.14-.25,9-.67a40,40,0,0,0,39.26-34C177.34,180.79,173.83,165.73,166.25,156.55Z'/></svg>">
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="top-navbar">
+    <a href="../../index.html" class="logo-area">
+      <i class="ph-fill ph-paw-print logo-icon" style="color: var(--primary-color); font-size: 2rem;"></i>
+      Anabul Checker
+    </a>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="ph ph-list"></i>
+    </div>
+    <div class="nav-menu">
+      <a href="../../index.html" class="nav-item">
+        <i class="ph ph-squares-four nav-icon"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/menu/anabul/index.html" class="nav-item">
+        <i class="ph ph-paw-print nav-icon"></i>
+        <span>Profil Hewan</span>
+      </a>
+      <a href="/menu/jadwal/index.html" class="nav-item">
+        <i class="ph ph-calendar-blank nav-icon"></i>
+        <span>Jadwal Makan</span>
+      </a>
+      <a href="/menu/stok/index.html" class="nav-item">
+        <i class="ph ph-package nav-icon"></i>
+        <span>Stok</span>
+      </a>
+      <a href="/menu/anabul-liar/index.html" class="nav-item active">
+        <i class="ph ph-cat nav-icon"></i>
+        <span>Street Feeding</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-section" style="margin-bottom: 20px;">
+      <div class="header-text">
+        <h1 style="font-size:1.8rem;"><i class="ph-fill ph-cat header-title-icon" style="color: var(--primary-color);"></i> Street Feeding</h1>
+        <p>Catat dan kelola riwayat street feeding kamu</p>
+      </div>
+      <div class="header-actions">
+         <button class="btn btn-primary" id="btnShowForm">+ Tambah Catatan</button>
+      </div>
+    </div>
+    
+    <div class="content-box">
+      <div class="actions-bar">
+         <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Cari keterangan...">
+         </div>
+         <select id="filterSelect" class="filter-btn">
+            <option value="all">Semua Data</option>
+            <option value="newest">Terbaru</option>
+            <option value="oldest">Terlama</option>
+         </select>
+      </div>
+
+    <!-- Form Tambah Street Feeding -->
+    <div id="formTambahContainer" class="form-modal-overlay hidden">
+      <div class="form-container">
+      <h3 class="mb-3">Tambah Catatan Street Feeding</h3>
+      <form id="formTambahSF">
+        
+        <div class="form-group">
+          <label>Tanggal dan Waktu</label>
+          <input type="datetime-local" id="waktu" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Stok Yang Digunakan</label>
+          <select id="idStok" class="form-control" required>
+            <option value="" disabled selected>Pilih Stok</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Jumlah Yang Diberikan</label>
+          <input type="number" step="0.01" id="jumlahDiberikan" class="form-control" required placeholder="Contoh: 150">
+        </div>
+
+        <div class="form-group">
+          <label>Keterangan / Lokasi</label>
+          <input type="text" id="keterangan" class="form-control" required placeholder="Contoh: Kucing liar di taman kota">
+        </div>
+        
+        <div class="btn-group">
+          <input type="hidden" id="idEdit" value="">
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">Simpan Catatan</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelForm">Batal</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+    <!-- Tabel Street Feeding -->
+    <div class="table-container">
+      <table id="sfTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Waktu</th>
+            <th>Stok Yang Diberikan</th>
+            <th>Jumlah</th>
+            <th>Keterangan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="sfTableBody">
+          <!-- Data SF dirender di sini via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    </div> <!-- End of content-box -->
+  </div>
+
+  <script src="../../js/script.js"></script>
+  <script>
+    const formContainer = document.getElementById('formTambahContainer');
+    const form = document.getElementById('formTambahSF');
+    const btnShowForm = document.getElementById('btnShowForm');
+    const btnCancelForm = document.getElementById('btnCancelForm');
+    const tableBody = document.getElementById('sfTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterSelect');
+    const selectStok = document.getElementById('idStok');
+    
+    let allSF = [];
+    let stokData = [];
+
+    btnShowForm.addEventListener('click', () => {
+      formContainer.classList.remove('hidden');
+      btnShowForm.classList.add('hidden');
+    });
+
+    btnCancelForm.addEventListener('click', () => {
+      formContainer.classList.add('hidden');
+      btnShowForm.classList.remove('hidden');
+      document.getElementById('idEdit').value = '';
+      document.getElementById('btnSubmitForm').innerText = 'Simpan Catatan';
+      form.reset();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const idEdit = document.getElementById('idEdit').value;
+      
+      const dWaktu = document.getElementById('waktu').value;
+      const dStok = selectStok.value;
+      const dStokName = dStok ? selectStok.options[selectStok.selectedIndex].text.split(' (')[0] : '';
+      const dJumlah = document.getElementById('jumlahDiberikan').value;
+      const keterangan = document.getElementById('keterangan').value;
+      
+      const dateObj = new Date(dWaktu);
+      
+      const data = {
+        waktu: formatDateToWIB(dateObj),
+        idStok: dStok,
+        stokDiberikan: dStokName,
+        jumlahDiberikan: parseFloat(dJumlah),
+        keterangan: keterangan
+      };
+
+      const action = idEdit ? 'updateStreetFeeding' : 'addStreetFeeding';
+      if(idEdit) data.id = idEdit;
+
+      const res = await fetchGAS(action, data);
+      if(res) {
+        formContainer.classList.add('hidden');
+        btnShowForm.classList.remove('hidden');
+        document.getElementById('idEdit').value = '';
+        document.getElementById('btnSubmitForm').innerText = 'Simpan Catatan';
+        form.reset();
+        showModal('success', 'Berhasil!', res.message, () => {
+          loadSF();
+          loadStok(); // reload dropdown
+        });
+      }
+    });
+
+    async function loadSF() {
+      tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>';
+      const res = await fetchGASGet('getStreetFeeding');
+      
+      if(res && res.data) {
+        allSF = res.data;
+        renderTable(allSF);
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Gagal memuat data.</td></tr>';
+      }
+    }
+
+    function renderTable(dataToRender) {
+      tableBody.innerHTML = '';
+      if(dataToRender.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Data street feeding kosong.</td></tr>';
+        return;
+      }
+
+      dataToRender.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item['Waktu']}</td>
+          <td>${item['Stok Yang Diberikan']}</td>
+          <td><b>${item['Jumlah Stok Diberikan']}</b></td>
+          <td>${item['Keterangan']}</td>
+          <td style="white-space: nowrap;">
+             <button class="btn btn-sm btn-info" onclick="editSF('${item.ID}')" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+             <button class="btn btn-sm btn-danger" onclick="hapusSF('${item.ID}')" title="Hapus"><i class="ph ph-trash"></i></button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function hapusSF(id) {
+      showConfirmModal('Hapus Catatan', 'Yakin ingin menghapus catatan ini?', async () => {
+        const res = await fetchGAS('deleteStreetFeeding', {id: id});
+        if(res) {
+          showModal('success', 'Berhasil', 'Catatan berhasil dihapus', () => {
+             loadSF();
+          });
+        }
+      });
+    }
+
+    function editSF(id) {
+      const item = allSF.find(s => s.ID === id);
+      if(item) {
+        document.getElementById('idEdit').value = item.ID;
+        
+        // Ensure date format is correct for datetime-local
+        // item['Waktu'] is usually something like 'dd/mm/yyyy hh:mm' which needs to be parsed if possible
+        // but we'll try to convert it to ISO or leave it blank if complex. 
+        // Or if it has isoTimestamp we can use it.
+        // Let's assume the user re-enters or we just do our best.
+        // Google Apps Script usually returns date string. If we format it poorly, it won't show.
+        // For simplicity, we just set the inputs.
+        
+        let stokOption = Array.from(selectStok.options).find(opt => opt.text.includes(item['Stok Yang Diberikan']));
+        if(stokOption) selectStok.value = stokOption.value;
+        
+        document.getElementById('jumlahDiberikan').value = item['Jumlah Stok Diberikan'];
+        document.getElementById('keterangan').value = item['Keterangan'];
+        
+        document.getElementById('btnSubmitForm').innerText = 'Update Catatan';
+        formContainer.classList.remove('hidden');
+        btnShowForm.classList.add('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // Filter & Search Logic
+    function applyFilter() {
+      let filtered = [...allSF];
+      
+      const q = searchInput.value.toLowerCase();
+      if(q) {
+        filtered = filtered.filter(item => 
+          item['Keterangan'].toLowerCase().includes(q) || 
+          item['Stok Yang Diberikan'].toLowerCase().includes(q)
+        );
+      }
+      
+      const filterVal = filterSelect.value;
+      if(filterVal === 'newest') {
+         filtered.reverse();
+      }
+
+      renderTable(filtered);
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterSelect.addEventListener('change', applyFilter);
+
+    async function loadStok() {
+      const resStok = await fetchGASGet('getStok');
+      if(resStok && resStok.data) {
+        stokData = resStok.data;
+        selectStok.innerHTML = '<option value="" disabled selected>Pilih Stok</option>';
+        stokData.forEach(item => {
+          if(item.Status === 'Tersedia') {
+            selectStok.innerHTML += `<option value="${item.ID}">${item['Nama Stok']} (Sisa: ${item['Jumlah Stok']} ${item['Satuan Stok']})</option>`;
+          }
+        });
+      }
+    }
+
+    // Load initial
+    loadStok();
+    loadSF();
+  </script>
+</body>
+</html>

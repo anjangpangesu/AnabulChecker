@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anabul Checker - Stok</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23ff9f43' d='M88,72a24,24,0,1,1,24-24A24,24,0,0,1,88,72Zm80-48a24,24,0,1,0,24,24A24,24,0,0,0,168,24ZM68,100A24,24,0,1,0,92,124,24,24,0,0,0,68,100Zm120,0a24,24,0,1,0,24,24A24,24,0,0,0,188,100Zm-21.75,56.55A38.2,38.2,0,0,0,128,144a38.2,38.2,0,0,0-38.25,12.55,42.54,42.54,0,0,0-10,33.24A40,40,0,0,0,119,223.77c2.81.42,5.77.67,9,.67s6.14-.25,9-.67a40,40,0,0,0,39.26-34C177.34,180.79,173.83,165.73,166.25,156.55Z'/></svg>">
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="top-navbar">
+    <a href="../../index.html" class="logo-area">
+      <i class="ph-fill ph-paw-print logo-icon" style="color: var(--primary-color); font-size: 2rem;"></i>
+      Anabul Checker
+    </a>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="ph ph-list"></i>
+    </div>
+    <div class="nav-menu">
+      <a href="../../index.html" class="nav-item">
+        <i class="ph ph-squares-four nav-icon"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/menu/anabul/index.html" class="nav-item">
+        <i class="ph ph-paw-print nav-icon"></i>
+        <span>Profil Hewan</span>
+      </a>
+      <a href="/menu/jadwal/index.html" class="nav-item">
+        <i class="ph ph-calendar-blank nav-icon"></i>
+        <span>Jadwal Makan</span>
+      </a>
+      <a href="/menu/stok/index.html" class="nav-item active">
+        <i class="ph ph-package nav-icon"></i>
+        <span>Stok</span>
+      </a>
+      <a href="/menu/anabul-liar/index.html" class="nav-item">
+        <i class="ph ph-cat nav-icon"></i>
+        <span>Street Feeding</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-section" style="margin-bottom: 20px;">
+      <div class="header-text">
+        <h1 style="font-size:1.8rem;"><i class="ph-fill ph-package header-title-icon" style="color: var(--primary-color);"></i> Stok Pakan & Barang</h1>
+        <p>Kelola persediaan makanan, obat, dan perlengkapan anabulmu</p>
+      </div>
+      <div class="header-actions">
+         <button class="btn btn-primary" id="btnShowForm">+ Tambah Stok</button>
+      </div>
+    </div>
+    
+    <div class="content-box">
+      <div class="actions-bar">
+         <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Cari stok...">
+         </div>
+         <select id="filterSelect" class="filter-btn">
+            <option value="all">Semua Data</option>
+            <option value="newest">Terbaru</option>
+            <option value="oldest">Terlama</option>
+            <option value="Tersedia">Stok Tersedia</option>
+            <option value="Habis">Stok Habis</option>
+         </select>
+      </div>
+
+    <!-- Form Tambah Stok (Hidden by default) -->
+    <div id="formTambahContainer" class="form-modal-overlay hidden">
+      <div class="form-container">
+      <h3 class="mb-3">Tambah Stok</h3>
+      <form id="formTambahStok">
+        <div class="form-group">
+          <label>Nama Stok / Merek</label>
+          <input type="text" id="namaStok" class="form-control" required placeholder="Contoh: Whiskas Tuna">
+        </div>
+
+        <div class="form-group">
+          <label>Harga (Rp)</label>
+          <input type="number" step="1" id="hargaStok" class="form-control" required placeholder="Contoh: 50000">
+        </div>
+        
+        <div class="form-group">
+          <label>Kategori Stok</label>
+          <select id="kategoriStok" class="form-control" required>
+            <option value="" disabled selected>Pilih Kategori</option>
+            <option value="Makanan">Makanan</option>
+            <option value="Vitamin/Obat">Vitamin/Obat</option>
+            <option value="Snack">Snack</option>
+            <option value="Minuman">Minuman</option>
+            <option value="Pasir">Pasir</option>
+            <option value="Perlengkapan Lainnya">Perlengkapan Lainnya</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Jumlah Stok (Angka)</label>
+          <input type="number" step="0.01" id="jumlahStok" class="form-control" required placeholder="Contoh: 1000">
+          <small class="form-help">Jika satuan produk Kg, ubah ke gram. Misal 1 Kg = 1000 Gram. 1 Liter = 1000 ML.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Satuan Stok</label>
+          <select id="satuanStok" class="form-control" required>
+            <option value="" disabled selected>Pilih Satuan</option>
+            <option value="Gram">Gram</option>
+            <option value="Liter">Liter/ML</option>
+            <option value="Pcs">Pcs / Buah</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Tanggal Pembelian</label>
+          <input type="date" id="tanggalPembelian" class="form-control" required>
+        </div>
+        
+        <div class="btn-group">
+          <input type="hidden" id="idEdit" value="">
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">Simpan Stok</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelForm">Batal</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+    <!-- Tabel Stok -->
+    <div class="table-container">
+      <table id="stokTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tanggal Pembelian</th>
+            <th>Nama Stok / Merek</th>
+            <th>Harga</th>
+            <th>Kategori</th>
+            <th>Jumlah</th>
+            <th>Satuan</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="stokTableBody">
+          <!-- Data stok dirender di sini via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    </div> <!-- End of content-box -->
+  </div>
+
+  <script src="../../js/script.js"></script>
+  <script>
+    const formContainer = document.getElementById('formTambahContainer');
+    const form = document.getElementById('formTambahStok');
+    const btnShowForm = document.getElementById('btnShowForm');
+    const btnCancelForm = document.getElementById('btnCancelForm');
+    const tableBody = document.getElementById('stokTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterSelect');
+    
+    let allStok = [];
+
+    btnShowForm.addEventListener('click', () => {
+      formContainer.classList.remove('hidden');
+      btnShowForm.classList.add('hidden');
+    });
+
+    btnCancelForm.addEventListener('click', () => {
+      formContainer.classList.add('hidden');
+      btnShowForm.classList.remove('hidden');
+      document.getElementById('idEdit').value = '';
+      document.getElementById('btnSubmitForm').innerText = 'Simpan Stok';
+      form.reset();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const idEdit = document.getElementById('idEdit').value;
+      
+      const data = {
+        namaStok: document.getElementById('namaStok').value,
+        harga: document.getElementById('hargaStok').value,
+        kategoriStok: document.getElementById('kategoriStok').value,
+        jumlahStok: document.getElementById('jumlahStok').value,
+        satuanStok: document.getElementById('satuanStok').value,
+        tanggalPembelian: document.getElementById('tanggalPembelian').value
+      };
+
+      const action = idEdit ? 'updateStok' : 'addStok';
+      if(idEdit) data.id = idEdit;
+
+      const res = await fetchGAS(action, data);
+      if(res) {
+        formContainer.classList.add('hidden');
+        btnShowForm.classList.remove('hidden');
+        document.getElementById('idEdit').value = '';
+        document.getElementById('btnSubmitForm').innerText = 'Simpan Stok';
+        form.reset();
+        showModal('success', 'Berhasil!', res.message, () => {
+          loadStok();
+        });
+      }
+    });
+
+    async function loadStok() {
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Memuat data...</td></tr>';
+      const res = await fetchGASGet('getStok');
+      
+      if(res && res.data) {
+        allStok = res.data;
+        renderTable(allStok);
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Gagal memuat data.</td></tr>';
+      }
+    }
+
+    function renderTable(dataToRender) {
+      tableBody.innerHTML = '';
+      if(dataToRender.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data stok kosong.</td></tr>';
+        return;
+      }
+
+      dataToRender.forEach((item, index) => {
+        let statusBadge = item.Status === 'Tersedia' ? 'badge-success' : 'badge-danger';
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item['Tanggal Pembelian'].split('T')[0]}</td>
+          <td>${item['Nama Stok']}</td>
+          <td>${formatRupiah(item['Harga'])}</td>
+          <td>${item['Kategori Stok']}</td>
+          <td><b>${item['Jumlah Stok']}</b></td>
+          <td>${item['Satuan Stok']}</td>
+          <td><span class="badge ${statusBadge}">${item.Status}</span></td>
+          <td style="white-space: nowrap;">
+             <button class="btn btn-sm btn-info" onclick="editStok('${item.ID}')" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+             <button class="btn btn-sm btn-danger" onclick="hapusStok('${item.ID}')" title="Hapus"><i class="ph ph-trash"></i></button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function hapusStok(id) {
+      showConfirmModal('Hapus Stok', 'Yakin ingin menghapus stok ini?', async () => {
+        const res = await fetchGAS('deleteStok', {id: id});
+        if(res) {
+          showModal('success', 'Berhasil', 'Stok berhasil dihapus', () => {
+             loadStok();
+          });
+        }
+      });
+    }
+
+    function editStok(id) {
+      const item = allStok.find(s => s.ID === id);
+      if(item) {
+        document.getElementById('idEdit').value = item.ID;
+        document.getElementById('namaStok').value = item['Nama Stok'];
+        document.getElementById('hargaStok').value = item['Harga'];
+        document.getElementById('kategoriStok').value = item['Kategori Stok'];
+        document.getElementById('jumlahStok').value = item['Jumlah Stok'];
+        document.getElementById('satuanStok').value = item['Satuan Stok'];
+        document.getElementById('tanggalPembelian').value = item['Tanggal Pembelian'].split('T')[0];
+        
+        document.getElementById('btnSubmitForm').innerText = 'Update Stok';
+        formContainer.classList.remove('hidden');
+        btnShowForm.classList.add('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // Filter & Search Logic
+    function applyFilter() {
+      let filtered = [...allStok];
+      
+      // Search
+      const q = searchInput.value.toLowerCase();
+      if(q) {
+        filtered = filtered.filter(item => 
+          item['Nama Stok'].toLowerCase().includes(q) || 
+          item['Kategori Stok'].toLowerCase().includes(q)
+        );
+      }
+      
+      // Filter status/sort
+      const filterVal = filterSelect.value;
+      if(filterVal === 'Tersedia' || filterVal === 'Habis') {
+        filtered = filtered.filter(item => item.Status === filterVal);
+      }
+      
+      if(filterVal === 'newest') {
+        filtered.sort((a,b) => new Date(b['Tanggal Pembelian']) - new Date(a['Tanggal Pembelian']));
+      } else if(filterVal === 'oldest') {
+        filtered.sort((a,b) => new Date(a['Tanggal Pembelian']) - new Date(b['Tanggal Pembelian']));
+      }
+
+      renderTable(filtered);
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterSelect.addEventListener('change', applyFilter);
+
+    // Load initial
+    loadStok();
+  </script>
+</body>
+</html>

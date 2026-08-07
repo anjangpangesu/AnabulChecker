@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anabul Checker - Data Anabul</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23ff9f43' d='M88,72a24,24,0,1,1,24-24A24,24,0,0,1,88,72Zm80-48a24,24,0,1,0,24,24A24,24,0,0,0,168,24ZM68,100A24,24,0,1,0,92,124,24,24,0,0,0,68,100Zm120,0a24,24,0,1,0,24,24A24,24,0,0,0,188,100Zm-21.75,56.55A38.2,38.2,0,0,0,128,144a38.2,38.2,0,0,0-38.25,12.55,42.54,42.54,0,0,0-10,33.24A40,40,0,0,0,119,223.77c2.81.42,5.77.67,9,.67s6.14-.25,9-.67a40,40,0,0,0,39.26-34C177.34,180.79,173.83,165.73,166.25,156.55Z'/></svg>">
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="top-navbar">
+    <a href="../../index.html" class="logo-area">
+      <i class="ph-fill ph-paw-print logo-icon" style="color: var(--primary-color); font-size: 2rem;"></i>
+      Anabul Checker
+    </a>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="ph ph-list"></i>
+    </div>
+    <div class="nav-menu">
+      <a href="../../index.html" class="nav-item">
+        <i class="ph ph-squares-four nav-icon"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/menu/anabul/index.html" class="nav-item active">
+        <i class="ph ph-paw-print nav-icon"></i>
+        <span>Profil Hewan</span>
+      </a>
+      <a href="/menu/jadwal/index.html" class="nav-item">
+        <i class="ph ph-calendar-blank nav-icon"></i>
+        <span>Jadwal Makan</span>
+      </a>
+      <a href="/menu/stok/index.html" class="nav-item">
+        <i class="ph ph-package nav-icon"></i>
+        <span>Stok</span>
+      </a>
+      <a href="/menu/anabul-liar/index.html" class="nav-item">
+        <i class="ph ph-cat nav-icon"></i>
+        <span>Street Feeding</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-section" style="margin-bottom: 20px;">
+      <div class="header-text">
+        <h1 style="font-size:1.8rem;"><i class="ph-fill ph-paw-print header-title-icon" style="color: var(--primary-color);"></i> Data Anabul</h1>
+        <p>Kelola data anabul kesayanganmu di sini</p>
+      </div>
+      <div class="header-actions">
+         <button class="btn btn-primary" id="btnShowForm">+ Tambah Anabul</button>
+      </div>
+    </div>
+    
+    <div class="content-box">
+
+    <!-- Form Tambah Anabul (Hidden by default) -->
+    <div id="formTambahContainer" class="form-modal-overlay hidden">
+      <div class="form-container">
+      <h3 class="mb-3">Tambah Data Anabul</h3>
+      <form id="formTambahAnabul">
+        <div class="form-group">
+          <label>Nama Anabul</label>
+          <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama anabul">
+        </div>
+        
+        <div class="form-group">
+          <label>Kategori Anabul</label>
+          <select id="kategori" class="form-control" required>
+            <option value="" disabled selected>Pilih Kategori</option>
+            <option value="Kucing">Kucing</option>
+            <option value="Anjing">Anjing</option>
+            <option value="Burung">Burung</option>
+            <option value="Kelinci">Kelinci</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Jenis/Ras Anabul</label>
+          <input type="text" id="jenis" class="form-control" required placeholder="Contoh: Persia, Golden Retriever">
+        </div>
+        
+        <div class="form-group">
+          <label>Tanggal Lahir</label>
+          <input type="date" id="tanggalLahir" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Berat Anabul (Kg)</label>
+          <input type="number" step="0.1" id="berat" class="form-control" required placeholder="Contoh: 4.5">
+        </div>
+        
+        <div class="btn-group">
+          <input type="hidden" id="idEdit" value="">
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">Simpan Anabul</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelForm">Batal</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+    <!-- List Anabul Cards -->
+    <div id="anabulList" class="card-container">
+      <!-- Data anabul akan dirender di sini via JS -->
+    </div>
+    
+    </div> <!-- End of content-box -->
+  </div>
+
+  <script src="../../js/script.js"></script>
+  <script>
+    const formContainer = document.getElementById('formTambahContainer');
+    const form = document.getElementById('formTambahAnabul');
+    const btnShowForm = document.getElementById('btnShowForm');
+    const btnCancelForm = document.getElementById('btnCancelForm');
+    const anabulList = document.getElementById('anabulList');
+
+    btnShowForm.addEventListener('click', () => {
+      formContainer.classList.remove('hidden');
+      btnShowForm.classList.add('hidden');
+    });
+
+    btnCancelForm.addEventListener('click', () => {
+      formContainer.classList.add('hidden');
+      btnShowForm.classList.remove('hidden');
+      document.getElementById('idEdit').value = '';
+      document.getElementById('btnSubmitForm').innerText = 'Simpan Anabul';
+      form.reset();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const idEdit = document.getElementById('idEdit').value;
+      
+      const data = {
+        nama: document.getElementById('nama').value,
+        kategori: document.getElementById('kategori').value,
+        jenis: document.getElementById('jenis').value,
+        tanggalLahir: document.getElementById('tanggalLahir').value,
+        berat: document.getElementById('berat').value
+      };
+
+      const action = idEdit ? 'updateAnabul' : 'addAnabul';
+      if(idEdit) data.id = idEdit;
+
+      const res = await fetchGAS(action, data);
+      if(res) {
+        formContainer.classList.add('hidden');
+        btnShowForm.classList.remove('hidden');
+        document.getElementById('idEdit').value = '';
+        document.getElementById('btnSubmitForm').innerText = 'Simpan Anabul';
+        form.reset();
+        showModal('success', 'Berhasil!', res.message, () => {
+          loadAnabul();
+        });
+      }
+    });
+
+    async function loadAnabul() {
+      anabulList.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-light);">Memuat data...</p>';
+      const res = await fetchGASGet('getAnabul');
+      
+      if(res && res.data) {
+        allAnabul = res.data;
+        if(allAnabul.length === 0) {
+          anabulList.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-light);">Belum ada data anabul.</p>';
+          return;
+        }
+
+        anabulList.innerHTML = '';
+        allAnabul.forEach((item, index) => {
+          const age = getAge(item['Tanggal Lahir']);
+          let iconUrl = 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png';
+          if(item['Kategori'] === 'Kucing') iconUrl = 'https://cdn-icons-png.flaticon.com/512/616/616430.png';
+          else if(item['Kategori'] === 'Anjing') iconUrl = 'https://cdn-icons-png.flaticon.com/512/616/616408.png';
+          else if(item['Kategori'] === 'Burung') iconUrl = 'https://cdn-icons-png.flaticon.com/512/3063/3063806.png';
+
+          const colorClass = 'card-pastel-' + (index % 5);
+
+          const card = document.createElement('div');
+          card.className = 'card ' + colorClass;
+          card.innerHTML = `
+            <div class="card-actions" style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
+              <button class="btn btn-sm btn-info" onclick="editAnabul('${item.ID}')" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="hapusAnabul('${item.ID}')" title="Hapus"><i class="ph ph-trash"></i></button>
+            </div>
+            <div class="card-category">${item['Kategori']}</div>
+            <div class="card-icon"><img src="${iconUrl}" alt="icon"></div>
+            <h3 class="card-title">${item['Nama']} <span style="font-size: 1rem; color:var(--text-light); font-weight:normal;">(${item['Jenis']})</span></h3>
+            <p class="card-subtitle">Lahir: ${item['Tanggal Lahir'].split('T')[0]}</p>
+            
+            <div class="card-stats">
+              <div class="stat-item">
+                <span class="stat-value">${age} Tahun</span>
+                <span class="stat-label">Usia</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">${item['Berat']} Kg</span>
+                <span class="stat-label">Berat</span>
+              </div>
+            </div>
+          `;
+          anabulList.appendChild(card);
+        });
+      }
+    }
+
+    function editAnabul(id) {
+      const item = allAnabul.find(a => a.ID === id);
+      if(item) {
+        document.getElementById('idEdit').value = item.ID;
+        document.getElementById('nama').value = item['Nama'];
+        document.getElementById('kategori').value = item['Kategori'];
+        document.getElementById('jenis').value = item['Jenis'];
+        document.getElementById('tanggalLahir').value = item['Tanggal Lahir'].split('T')[0];
+        document.getElementById('berat').value = item['Berat'];
+        
+        document.getElementById('btnSubmitForm').innerText = 'Update Anabul';
+        formContainer.classList.remove('hidden');
+        btnShowForm.classList.add('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function hapusAnabul(id) {
+      showConfirmModal('Hapus Anabul', 'Yakin ingin menghapus anabul ini?', async () => {
+        const res = await fetchGAS('deleteAnabul', {id: id});
+        if(res) {
+          showModal('success', 'Berhasil', 'Data anabul berhasil dihapus', () => {
+             loadAnabul();
+          });
+        }
+      });
+    }
+
+    // Load data on init
+    loadAnabul();
+  </script>
+</body>
+</html>
