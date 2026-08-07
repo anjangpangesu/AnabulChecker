@@ -209,12 +209,7 @@ function getAge(dateString) {
         }
     }
     
-    let result = [];
-    if (years > 0) result.push(`${years} Tahun`);
-    if (months > 0) result.push(`${months} Bulan`);
-    if (years === 0 && months === 0) result.push("0 Bulan");
-    
-    return result.join(" ");
+    return `${years} Tahun ${months} Bulan`;
 }
 
 function formatDateToWIB(dateObj) {
